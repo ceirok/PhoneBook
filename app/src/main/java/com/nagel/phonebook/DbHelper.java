@@ -84,7 +84,7 @@ public class DbHelper extends SQLiteOpenHelper{
 
     private String insertZipcodes() {
         InputStream stream = context.getResources().openRawResource(R.raw.zipcodes);
-        StringBuilder builder = new StringBuilder("insert into zipcodes (code, city) values");
+        StringBuilder builder = new StringBuilder(context.getString(R.string.insert_into_zipcoded));
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream)))
         {
             addRow(builder, reader.readLine());

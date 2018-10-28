@@ -64,8 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        menu.add(Menu.NONE, MENU_SHOW, Menu.NONE, "Show Contacts");
-        menu.add(Menu.NONE, MENU_CREATE, Menu.NONE, "Create contact");
+        menu.add(Menu.NONE, MENU_SHOW, Menu.NONE, R.string.show_contacts);
+        menu.add(Menu.NONE, MENU_CREATE, Menu.NONE, R.string.create_contacts);
     }
 
     @Override
@@ -86,23 +86,23 @@ public class MainActivity extends AppCompatActivity {
     private void showPeople(Zipcode zipcode) {
         people = new People(db, zipcode);
         if (people.getPeople().size() == 0){
-            Toast.makeText(this, "No contacts found", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.no_contacts_found, Toast.LENGTH_LONG).show();
         }
         else if (people.getPeople().size() == 1){
             Intent intent = new Intent(this, PersonActivity.class);
-            intent.putExtra("person", people.getPeople().get(0));
+            intent.putExtra(getString(R.string.person), people.getPeople().get(0));
             startActivity(intent);
         }
         else {
             Intent intent = new Intent(this, PeopleActivity.class);
-            intent.putExtra("people", people);
+            intent.putExtra(getString(R.string.people), people);
             startActivity(intent);
         }
     }
 
     private void createPerson(Zipcode zipcode){
         Intent intent = new Intent(this, PersonActivity.class);
-        intent.putExtra("zipcode", zipcode);
+        intent.putExtra(getString(R.string.zipcode), zipcode);
         startActivity(intent);
     }
 
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(Menu.NONE, MENU_SEARCH, Menu.NONE, "Search contacts");
+        menu.add(Menu.NONE, MENU_SEARCH, Menu.NONE, R.string.search_contacts);
         return super.onCreateOptionsMenu(menu);
     }
 

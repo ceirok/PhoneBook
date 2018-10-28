@@ -68,7 +68,7 @@ public class PersonActivity extends AppCompatActivity {
             zipcode = person.getZipcode();
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        txtZip.setText(zipcode.toString());
+        txtZip.setText(zipcode.getCode());
         disable(txtDate);
     }
 
@@ -109,19 +109,18 @@ public class PersonActivity extends AppCompatActivity {
             String date = txtDate.getText().toString().trim();
             String title = txtTitle.getText().toString().trim();
             String text = txtText.getText().toString().trim();
-            String zip = txtZip.getText().toString();
+            String zip = txtZip.getText().toString().trim();
             DbHelper dbHelper = new DbHelper(this);
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-            ContentValues values = new ContentValues(8);
+            ContentValues values = new ContentValues(9);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_FIRSTNAME], fname);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_LASTNAME], lname);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_ADDRESS], addr);
-            if(zip.matches("^\\d{4} (\\w+)")){
-                values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_ADDRESS], zip);
+            if(zip.matches("^\\d{4}$")){
+                values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_CODE], zip);
             } else {
-                Toast.makeText(this, "Invalid zipcode format", Toast.LENGTH_SHORT).show();
-                values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_CODE], zipcode.getCode());
+                txtZip.setError(getString(R.string.zipcode_error));
             }
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_PHONE], phone);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_MAIL], mail);
@@ -141,8 +140,13 @@ public class PersonActivity extends AppCompatActivity {
                 String[] args = { "" + person.getId() };
                 db.update(DbHelper.ATABLE_NAME, values, "id = ?", args);
             }
-            db.close();
-            onSupportNavigateUp();
+
+            if(txtZip.getError() != null || txtZip.getText().length() == 0) {
+                Toast.makeText(this, R.string.invalid_input_error, Toast.LENGTH_SHORT).show();
+            } else {
+                db.close();
+                onSupportNavigateUp();
+            }
         }
     }
 
