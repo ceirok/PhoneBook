@@ -60,7 +60,7 @@ public class SearchActivity extends AppCompatActivity {
         }
         else {
             Intent intent = new Intent(this, PeopleActivity.class);
-            intent.putExtra("persons", persons);
+            intent.putExtra("people", persons);
             db.close();
             startActivity(intent);
             finish();

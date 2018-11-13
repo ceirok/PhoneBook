@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.List;
 
 /* Is used to display contact details, but also used to create new contacts, edit existing contacts, and
 delete contacts.
@@ -99,6 +100,7 @@ public class PersonActivity extends AppCompatActivity {
     should specify a WHERE part. */
     public void onOkay(View view)
     {
+        String zip = txtZip.getText().toString().trim();
         String fname = txtFirstName.getText().toString().trim();
         if (fname.length() > 0)
         {
@@ -109,19 +111,21 @@ public class PersonActivity extends AppCompatActivity {
             String date = txtDate.getText().toString().trim();
             String title = txtTitle.getText().toString().trim();
             String text = txtText.getText().toString().trim();
-            String zip = txtZip.getText().toString().trim();
+
             DbHelper dbHelper = new DbHelper(this);
             SQLiteDatabase db = dbHelper.getWritableDatabase();
+            boolean validCode = checkZipCode(db, zip);
 
-            ContentValues values = new ContentValues(9);
+            if(!validCode) {
+                Toast.makeText(this, getString(R.string.zipcode_error), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            ContentValues values = new ContentValues(8);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_FIRSTNAME], fname);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_LASTNAME], lname);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_ADDRESS], addr);
-            if(zip.matches("^\\d{4}$")){
-                values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_CODE], zip);
-            } else {
-                txtZip.setError(getString(R.string.zipcode_error));
-            }
+            values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_CODE], zip);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_PHONE], phone);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_MAIL], mail);
             values.put(DbHelper.ATABLE_COLUMNS[DbHelper.ACOLUMN_TITLE], title);
@@ -140,14 +144,24 @@ public class PersonActivity extends AppCompatActivity {
                 String[] args = { "" + person.getId() };
                 db.update(DbHelper.ATABLE_NAME, values, "id = ?", args);
             }
-
-            if(txtZip.getError() != null || txtZip.getText().length() == 0) {
-                Toast.makeText(this, R.string.invalid_input_error, Toast.LENGTH_SHORT).show();
-            } else {
-                db.close();
-                onSupportNavigateUp();
-            }
+            db.close();
+            onSupportNavigateUp();
         }
+        else {
+            Toast.makeText(this, getString(R.string.error), Toast.LENGTH_SHORT).show();
+        }
+    }
+    public boolean checkZipCode(SQLiteDatabase db, String zip) {
+        if(zipcode.getCode().equals(zip)){
+            return true;
+        }
+        Zipcodes model = new Zipcodes(db);
+        List<Zipcode> zipcodes = model.getZipcodes();
+        for(Zipcode  item:zipcodes) {
+            if(item.getCode().equals(zip)) return true;
+        }
+
+        return false;
     }
 
     /* Finally, there is the last event handler used to delete a contact and thus perform a SQL
